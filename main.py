@@ -6,9 +6,10 @@ import sys
 import os
 from dotenv import load_dotenv
 
-# โหลด environment variables จากไฟล์ .env
+# โหลดไฟล์ .env
 load_dotenv()
 
+# กำหนด intents
 intents = discord.Intents.default()
 intents.message_content = True
 intents.guilds = True
@@ -18,11 +19,12 @@ intents.voice_states = True
 bot = commands.Bot(command_prefix='/', intents=intents)
 should_stop = False
 
+# โหลด token จาก .env
+token = os.getenv("DISCORD_BOT_TOKEN")
+
 @bot.event
 async def on_ready():
     print("BOT IS READY")
-    print("Bot is ready to go!")
-
     try:
         synced_commands = await bot.tree.sync()
         print(f"Synced {len(synced_commands)} commands")
@@ -50,11 +52,9 @@ async def poke(interaction: discord.Interaction, member: discord.Member, channel
         print("CREATE BACKGROUND PASS")
     except Exception as e:
         print("ERROR : ", e)
-        try:
-            # ส่งข้อความไปยังช่องที่เรียกคำสั่ง
-            await interaction.channel.send("บอทเกิดข้อผิดพลาด กำลังรีสตาร์ท...")
-        except discord.NotFound:
-            print("Channel not found.")
+        alert_channel = interaction.guild.system_channel  # ใช้ระบบของ guild เอง
+        if alert_channel:
+            await alert_channel.send("บอทเกิดข้อผิดพลาด กำลังรีสตาร์ท...")
         os.execv(sys.executable, ['python'] + sys.argv)
         should_stop = True
 
@@ -125,6 +125,5 @@ async def rebot(interaction: discord.Interaction):
     await interaction.response.send_message("กำลังรีสตาร์ทบอท...", ephemeral=True)
     os.execv(sys.executable, ['python'] + sys.argv)
 
-# ดึง token จาก environment variables (จาก .env)
-token = os.environ['DISCORD_TOKEN']
+# เรียกใช้บอท
 bot.run(token)
