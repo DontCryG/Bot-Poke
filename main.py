@@ -126,7 +126,4 @@ async def rebot(interaction: discord.Interaction):
     os.execv(sys.executable, ['python'] + sys.argv)
 
 # เรียกใช้บอท
-if token:
-    bot.run(token)
-else:
-    print("Token ไม่ถูกต้องหรือไม่พบในไฟล์ .env")
+bot.run(token)
