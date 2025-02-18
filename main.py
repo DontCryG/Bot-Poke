@@ -6,10 +6,9 @@ import sys
 import os
 from dotenv import load_dotenv
 
-# โหลดไฟล์ .env
+# โหลดค่าตัวแปรจากไฟล์ .env
 load_dotenv()
 
-# กำหนด intents
 intents = discord.Intents.default()
 intents.message_content = True
 intents.guilds = True
@@ -18,13 +17,14 @@ intents.voice_states = True
 
 bot = commands.Bot(command_prefix='/', intents=intents)
 should_stop = False
-
-# โหลด token จาก .env
-token = os.getenv("DISCORD_BOT_TOKEN")
+channel_id = "add your channel id with integer please remove double quotes"
 
 @bot.event
 async def on_ready():
     print("BOT IS READY")
+    start_channel = bot.get_channel(channel_id)
+    if start_channel:
+        await start_channel.send("บอท poke พร้อมใช้งาน")
     try:
         synced_commands = await bot.tree.sync()
         print(f"Synced {len(synced_commands)} commands")
@@ -38,7 +38,7 @@ async def test(interaction: discord.Interaction):
 @bot.tree.command(name="poke", description="poke เรียกคนใน server")
 @app_commands.describe(
     member="เลือกคนที่จะ poke",
-    channel="เลือก channel ที่ต้องการ",
+    channel="เลือก channel ที่จะตจ",
     rounds="Number of pokes"
 )
 async def poke(interaction: discord.Interaction, member: discord.Member, channel: discord.VoiceChannel, rounds: int):
@@ -52,7 +52,7 @@ async def poke(interaction: discord.Interaction, member: discord.Member, channel
         print("CREATE BACKGROUND PASS")
     except Exception as e:
         print("ERROR : ", e)
-        alert_channel = interaction.guild.system_channel  # ใช้ระบบของ guild เอง
+        alert_channel = bot.get_channel(channel_id)
         if alert_channel:
             await alert_channel.send("บอทเกิดข้อผิดพลาด กำลังรีสตาร์ท...")
         os.execv(sys.executable, ['python'] + sys.argv)
@@ -125,5 +125,6 @@ async def rebot(interaction: discord.Interaction):
     await interaction.response.send_message("กำลังรีสตาร์ทบอท...", ephemeral=True)
     os.execv(sys.executable, ['python'] + sys.argv)
 
-# เรียกใช้บอท
+# ใช้ dotenv โหลดค่าตัวแปรจาก .env
+token = os.getenv('DISCORD_TOKEN')
 bot.run(token)
