@@ -120,5 +120,5 @@ async def rebot(interaction: discord.Interaction):
     await interaction.response.send_message("กำลังรีสตาร์ทบอท...", ephemeral=True)
     os.execv(sys.executable, ['python'] + sys.argv)
 
-token = os.environ['DISCORD_TOKEN']
+token = os.environ['MTMzODc5NTY4NTY1ODYyNDEwMQ.GQYl-L.RFAapbGxfl-gJjGUjyN_y6ImaMXnppHInIx4Iw']
 bot.run(token)
