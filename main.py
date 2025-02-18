@@ -4,6 +4,10 @@ from discord import app_commands
 import asyncio
 import sys
 import os
+from dotenv import load_dotenv
+
+# โหลด environment variables จากไฟล์ .env
+load_dotenv()
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -13,13 +17,12 @@ intents.voice_states = True
 
 bot = commands.Bot(command_prefix='/', intents=intents)
 should_stop = False
-channel_id = "add your channel id with integer please remove double quotes"
+
 @bot.event
 async def on_ready():
     print("BOT IS READY")
-    start_channel = bot.get_channel(channel_id)
-    if start_channel:
-        await start_channel.send("บอท poke พร้อมใช้งาน")
+    print("Bot is ready to go!")
+
     try:
         synced_commands = await bot.tree.sync()
         print(f"Synced {len(synced_commands)} commands")
@@ -47,9 +50,11 @@ async def poke(interaction: discord.Interaction, member: discord.Member, channel
         print("CREATE BACKGROUND PASS")
     except Exception as e:
         print("ERROR : ", e)
-        alert_channel = bot.get_channel(channel_id)
-        if alert_channel:
-            await alert_channel.send("บอทเกิดข้อผิดพลาด กำลังรีสตาร์ท...")
+        try:
+            # ส่งข้อความไปยังช่องที่เรียกคำสั่ง
+            await interaction.channel.send("บอทเกิดข้อผิดพลาด กำลังรีสตาร์ท...")
+        except discord.NotFound:
+            print("Channel not found.")
         os.execv(sys.executable, ['python'] + sys.argv)
         should_stop = True
 
@@ -120,5 +125,6 @@ async def rebot(interaction: discord.Interaction):
     await interaction.response.send_message("กำลังรีสตาร์ทบอท...", ephemeral=True)
     os.execv(sys.executable, ['python'] + sys.argv)
 
+# ดึง token จาก environment variables (จาก .env)
 token = os.environ['DISCORD_TOKEN']
 bot.run(token)
